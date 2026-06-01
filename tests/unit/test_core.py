@@ -17,5 +17,9 @@ class TestCore(unittest.TestCase):
         with self.assertRaises(MemoryException):
             memory_engine.retrieve('key')
 
+        self.assertFalse('key' in memory_engine)
+        memory_engine.store('key', 'value')
+        self.assertTrue('key' in memory_engine)
+
 if __name__ == '__main__':
     unittest.main()
