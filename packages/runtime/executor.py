@@ -1,0 +1,52 @@
+from typing import Dict
+from logging import Logger
+from packages.core.engine import MemoryEngine
+from packages.core.types import MemoryModel
+from packages.core.exceptions import MemoryException
+
+import logging
+
+logger: Logger = logging.getLogger(__name__)
+
+class RuntimeExecutor:
+    def __init__(self, memory_engine: MemoryEngine):
+        self.memory_engine = memory_engine
+
+    def execute(self, command: str, **kwargs) -> Dict:
+        try:
+            if command == 'store':
+                key = kwargs.get('key')
+                value = kwargs.get('value')
+                if key is None or value is None:
+                    logger.error('Missing key or value')
+                    raise MemoryException('Missing key or value')
+                self.memory_engine.store(key, value)
+                return {'result': 'success'}
+            elif command == 'retrieve':
+                key = kwargs.get('key')
+                if key is None:
+                    logger.error('Missing key')
+                    raise MemoryException('Missing key')
+                value = self.memory_engine.retrieve(key)
+                return {'result': 'success', 'value': value}
+            elif command == 'delete':
+                key = kwargs.get('key')
+                if key is None:
+                    logger.error('Missing key')
+                    raise MemoryException('Missing key')
+                self.memory_engine.delete(key)
+                return {'result': 'success'}
+            elif command == 'update':
+                key = kwargs.get('key')
+                value = kwargs.get('value')
+                if key is None or value is None:
+                    logger.error('Missing key or value')
+                    raise MemoryException('Missing key or value')
+                self.memory_engine.update(key, value)
+                return {'result': 'success'}
+            else:
+                logger.error(f'Unknown command: {command}')
+                raise MemoryException(f'Unknown command: {command}')
+        except Exception as e:
+            logger.error(f'Error executing command: {str(e)}')
+            raise MemoryException(f'Error executing command: {str(e)}')
