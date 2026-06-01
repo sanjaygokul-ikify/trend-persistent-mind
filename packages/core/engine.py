@@ -56,3 +56,6 @@ class MemoryEngine:
 
     def get_memory_model(self) -> MemoryModel:
         return self.memory_model
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.memory_store
