@@ -1,0 +1,1 @@
+Contributions are welcome. Please submit a pull request with a clear description of the changes and a reference to the related issue.
