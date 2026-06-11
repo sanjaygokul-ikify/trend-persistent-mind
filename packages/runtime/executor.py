@@ -3,17 +3,20 @@ from logging import Logger
 from packages.core.engine import MemoryEngine
 from packages.core.types import MemoryModel
 from packages.core.exceptions import MemoryException
-
 import logging
+import time
 
 logger: Logger = logging.getLogger(__name__)
 
 class RuntimeExecutor:
     def __init__(self, memory_engine: MemoryEngine):
         self.memory_engine = memory_engine
+        self.cache_hits = 0
+        self.cache_misses = 0
 
     def execute(self, command: str, **kwargs) -> Dict:
         try:
+            start_time = time.time()
             if command == 'store':
                 key = kwargs.get('key')
                 value = kwargs.get('value')
@@ -48,5 +51,8 @@ class RuntimeExecutor:
                 logger.error(f'Unknown command: {command}')
                 raise MemoryException(f'Unknown command: {command}')
         except Exception as e:
+            end_time = time.time()
+            with open("metrics.txt", "a") as f:
+                f.write(f"Command {command} took {end_time - start_time} seconds to execute.\n")
             logger.error(f'Error executing command: {str(e)}')
             raise MemoryException(f'Error executing command: {str(e)}')
