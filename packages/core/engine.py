@@ -82,3 +82,9 @@ class MemoryEngine:
     def __contains__(self, key: str) -> bool:
         with self.lock:
             return key in self.memory_store
+
+    def get_hit_rate(self) -> float:
+        with self.lock:
+            if self.hits + self.misses == 0:
+                return 0.0
+            return self.hits / (self.hits + self.misses)
