@@ -68,6 +68,8 @@ class MemoryEngine:
                     self.memory_store[key] = value
                     if key in self.cache:
                         self.cache[key] = value
+                    elif len(self.cache) < self.cache_size:
+                        self.cache[key] = value
                     logger.info(f'Updated key {key} with value {value}')
                 else:
                     logger.error(f'Key {key} not found')
