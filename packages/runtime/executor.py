@@ -13,8 +13,11 @@ class RuntimeExecutor:
         self.memory_engine = memory_engine
         self.cache_hits = 0
         self.cache_misses = 0
+        self.timeout = 5  # Added default timeout
 
-    def execute(self, command: str, **kwargs) -> Dict:
+    def execute(self, command: str, timeout: int = None, **kwargs) -> Dict:
+        if timeout is None:
+            timeout = self.timeout
         try:
             start_time = time.time()
             if command == 'store':
@@ -30,8 +33,12 @@ class RuntimeExecutor:
                 if key is None:
                     logger.error('Missing key')
                     raise MemoryException('Missing key')
-                value = self.memory_engine.retrieve(key)
-                return {'result': 'success', 'value': value}
+                try:
+                    value = self.memory_engine.retrieve(key)
+                    return {'result': 'success', 'value': value}
+                except MemoryException as e:
+                    logger.error(str(e))
+                    raise
             elif command == 'delete':
                 key = kwargs.get('key')
                 if key is None:
