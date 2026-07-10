@@ -13,7 +13,7 @@ class RuntimeExecutor:
         self.memory_engine = memory_engine
         self.cache_hits = 0
         self.cache_misses = 0
-        self.timeout = 5  # Added default timeout
+        self.timeout: int = 5  # Added default timeout
 
     def execute(self, command: str, timeout: int = None, **kwargs) -> Dict:
         if timeout is None:
