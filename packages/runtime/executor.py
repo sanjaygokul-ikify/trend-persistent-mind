@@ -57,9 +57,15 @@ class RuntimeExecutor:
             else:
                 logger.error(f'Unknown command: {command}')
                 raise MemoryException(f'Unknown command: {command}')
-        except Exception as e:
+        except MemoryException as e:
             end_time = time.time()
             with open("metrics.txt", "a") as f:
                 f.write(f"Command {command} took {end_time - start_time} seconds to execute.\n")
             logger.error(f'Error executing command: {str(e)}')
             raise MemoryException(f'Error executing command: {str(e)}')
+        except Exception as e:
+            end_time = time.time()
+            with open("metrics.txt", "a") as f:
+                f.write(f"Command {command} took {end_time - start_time} seconds to execute.\n")
+            logger.error(f'Error executing command: {str(e)}')
+            raise
