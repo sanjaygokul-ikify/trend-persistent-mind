@@ -5,6 +5,7 @@ from packages.core.types import MemoryModel
 from packages.core.exceptions import MemoryException
 import logging
 import time
+import threading
 
 logger: Logger = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ class RuntimeExecutor:
         self.cache_hits = 0
         self.cache_misses = 0
         self.timeout: int = 5  # Added default timeout
+        self.lock = threading.Lock()
 
     def execute(self, command: str, timeout: int = None, **kwargs) -> Dict:
         if timeout is None:
@@ -26,7 +28,8 @@ class RuntimeExecutor:
                 if key is None or value is None:
                     logger.error('Missing key or value')
                     raise MemoryException('Missing key or value')
-                self.memory_engine.store(key, value)
+                with self.lock:
+                    self.memory_engine.store(key, value)
                 return {'result': 'success'}
             elif command == 'retrieve':
                 key = kwargs.get('key')
@@ -34,7 +37,8 @@ class RuntimeExecutor:
                     logger.error('Missing key')
                     raise MemoryException('Missing key')
                 try:
-                    value = self.memory_engine.retrieve(key)
+                    with self.lock:
+                        value = self.memory_engine.retrieve(key)
                     return {'result': 'success', 'value': value}
                 except MemoryException as e:
                     logger.error(str(e))
@@ -44,7 +48,8 @@ class RuntimeExecutor:
                 if key is None:
                     logger.error('Missing key')
                     raise MemoryException('Missing key')
-                self.memory_engine.delete(key)
+                with self.lock:
+                    self.memory_engine.delete(key)
                 return {'result': 'success'}
             elif command == 'update':
                 key = kwargs.get('key')
@@ -52,7 +57,8 @@ class RuntimeExecutor:
                 if key is None or value is None:
                     logger.error('Missing key or value')
                     raise MemoryException('Missing key or value')
-                self.memory_engine.update(key, value)
+                with self.lock:
+                    self.memory_engine.update(key, value)
                 return {'result': 'success'}
             else:
                 logger.error(f'Unknown command: {command}')
