@@ -74,4 +74,9 @@ class RuntimeExecutor:
             with open("metrics.txt", "a") as f:
                 f.write(f"Command {command} took {end_time - start_time} seconds to execute.\n")
             logger.error(f'Error executing command: {str(e)}')
-            raise
+            raise MemoryException(f'Error executing command: {str(e)}')
+        finally:
+            end_time = time.time()
+            if end_time - start_time > timeout:
+                logger.error(f'Timeout exceeded for command {command}')
+                raise MemoryException(f'Timeout exceeded for command {command}')
