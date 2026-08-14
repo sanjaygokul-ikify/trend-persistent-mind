@@ -16,6 +16,7 @@ class RuntimeExecutor:
         self.cache_misses = 0
         self.timeout: int = 5  # Added default timeout
         self.lock = threading.Lock()
+        self._executor_thread = None
 
     def execute(self, command: str, timeout: int = None, **kwargs) -> Dict:
         if timeout is None:
